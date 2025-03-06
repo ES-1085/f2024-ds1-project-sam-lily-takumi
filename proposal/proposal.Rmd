@@ -12,7 +12,9 @@ library(readxl)
 
 ## 1. Introduction
 
-Text goes here. Refer to the Markdown Quick Reference: Help -> Markdown Quick Reference. 
+Community Concepts, INC. (CCI) is an non-profit organization based in Lewiston, Maine. Their focus is on providing resources, both information and financial, to local residents and businesses. Specifically, administering housing support, mental health support, family and children's services.
+
+Data was provided by CCI in the form of two separate .xlsx files, one being Town Campaign Data and the other being Sept KPIs - Total Agency. This data details where CCI distributed their financial and informational help throughout the 2024 Fiscal Year. 
 
 ## 2. Data
 

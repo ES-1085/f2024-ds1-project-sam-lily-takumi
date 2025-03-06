@@ -6,8 +6,7 @@ Then, include codebooks (variables, and their descriptions) for your data file(s
 using the following format.
 
 
-
-## name of data file
+## FY24 Town Campaign Data
 
 - `variable1`: Description of variable 1
 - `variable2`: Description of variable 2
