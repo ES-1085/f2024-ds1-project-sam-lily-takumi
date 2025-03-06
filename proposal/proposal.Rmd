@@ -1,6 +1,6 @@
 ---
-title: "Project proposal"
-author: "Team name"
+title: "Community Concepts 1"
+author: "Sam, Lily, Takumi"
 output: html_document
 ---
 
@@ -12,27 +12,56 @@ library(readxl)
 
 ## 1. Introduction
 
-Community Concepts, INC. (CCI) is an non-profit organization based in Lewiston, Maine. Their focus is on providing resources, both information and financial, to local residents and businesses. Specifically, administering housing support, mental health support, family and children's services.
+Community Concepts, INC. (CCI) is a non-profit organization based in Lewiston, Maine. Their focus is on providing resources, both information and financial, to local residents and businesses. Specifically, administering housing support, mental health support, family and children's services. 
 
-Data was provided by CCI in the form of two separate .xlsx files, one being Town Campaign Data and the other being Sept KPIs - Total Agency. This data details where CCI distributed their financial and informational help throughout the 2024 Fiscal Year. 
+Data was provided by CCI in the form of two separate .xlsx files, one being Town Campaign Data and the other being Sept KPIs - Total Agency. This data details where CCI distributed their financial and informational help throughout the 2024 Fiscal Year.
+
+The Town Campaign Data variables are CCI’s different departments. Within each department, there are specific programs. The data is broken into the number of households and money spent by the program within specific towns throughout the state. The Sept KPIs data represents the organization’s goals for the 2024 fiscal year and breaks down their progress on these goals monthly. The variables that will be most helpful to us will be their goal for each program and how far they made it in achieving those goals (using percentages, with 100% equating to the goal exactly met).
+
+Research questions:
+- What is the relationship between program funding and achievement of yearly goals?
+- Which programs have the highest return on investment in the sense of the highest percentage of goal achievement per dollar spent?
+- Do programs with lower funding consistently fail to meet their goals, or are some programs more efficient with fewer resources?
+
 
 ## 2. Data
 
-Text goes here.
+Below is us reading in our data and glimpsing it.
 
-```{r}
+```{r read-data}
 sept_kpis <- read_excel("../data/FY24 Sept KPIs - Total Agency.xlsx")
 town_campaign <- read_excel("../data/FY24 Town Campaign Data.xlsx")
 ```
+```{r glimpse-data}
+glimpse(sept_kpis)
+glimpse(town_campaign)
+
+```
+
+We are working on the dimensions and codebook for this dataset. 
 
 ## 3. Data analysis plan
 
-Text goes here.
+The Sept KPIs dataset has data on the goal for each program and what percentage of that goal was met in the 2024 fiscal year. 
 
+Potential Visualizations:
+Scatterplot
+ - X-axis = Total funding for a program
+ - Y-axis = percentage of the goals achieved
+ - Example: Weatherization funding in the Housing program vs. % of goal achieved
+Pie Charts
+ - Dual pie charts, one representing the breakdown of spending across programs and the other depicting goal achievement based on program
+Bubble Chart
+ - X-axis = funding
+ - Y-axis = percentage of goals achieved
 
-```{r}
-# Code goes here
-```
+## 3.5 Reflections
+
+We are currently not sure how to reformat and manipulate the datasets to be more compatible with analysis and graphing in R. 
+
+We would like the reviewers to focus on research questions. We would like to make sure that the research questions we have are not too broad where it doesn't show meaningful trends, but not to specific that we lose the bigger picture. 
+
+We will most likely require help with wrangling the dataset and reformatting it so it is usable when analyzing and graphing. 
 
 
 ## 4. Data Ethics Review
