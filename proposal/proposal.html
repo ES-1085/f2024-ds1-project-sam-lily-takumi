@@ -519,6 +519,37 @@ efficient with fewer resources?</p>
 ## $ ...52                                   &lt;chr&gt; NA, &quot;TOTAL $&quot;, NA, NA, NA, NA,…</code></pre>
 <p>We are working on the dimensions and codebook for this dataset.</p>
 </div>
+<div id="data-cleaning" class="section level2">
+<h2>Data Cleaning</h2>
+<pre class="r"><code>#Department Column
+sept_kpis &lt;- sept_kpis |&gt;
+  rename(&quot;Department&quot; = &quot;Children&#39;s Services&quot;) 
+
+sept_kpis[1, &quot;Department&quot;] &lt;- &quot;Children&#39;s Services&quot;
+
+sept_kpis &lt;- sept_kpis |&gt;
+  fill(Department, .direction = &quot;down&quot;)
+
+#Program Column
+sept_kpis &lt;- sept_kpis |&gt;
+  rename(&quot;Program&quot; = &quot;...2&quot;) 
+
+sept_kpis[1, &quot;Program&quot;] &lt;- &quot;Children&#39;s Services&quot;
+sept_kpis[24, &quot;Program&quot;] &lt;- &quot;Housing Services&quot;
+sept_kpis[82, &quot;Program&quot;] &lt;- &quot;Development&quot;
+sept_kpis[90, &quot;Program&quot;] &lt;- &quot;CCFC&quot;
+sept_kpis[103, &quot;Program&quot;] &lt;- &quot;Asset Management&quot;
+sept_kpis[107, &quot;Program&quot;] &lt;- &quot;Property Management&quot;
+sept_kpis[110, &quot;Program&quot;] &lt;- &quot;Finance&quot;
+sept_kpis[140, &quot;Program&quot;] &lt;- &quot;Human Resources&quot;
+sept_kpis[142, &quot;Program&quot;] &lt;- &quot;Open Positions&quot;
+sept_kpis[157, &quot;Program&quot;] &lt;- &quot;Time to Hire&quot;
+sept_kpis[172, &quot;Program&quot;] &lt;- &quot;Head Count&quot;
+sept_kpis[187, &quot;Program&quot;] &lt;- &quot;Turnover Rate&quot;
+
+sept_kpis &lt;- sept_kpis |&gt;
+  fill(Program, .direction = &quot;down&quot;)</code></pre>
+</div>
 <div id="data-analysis-plan" class="section level2">
 <h2>3. Data analysis plan</h2>
 <p>The Sept KPIs dataset has data on the goal for each program and what

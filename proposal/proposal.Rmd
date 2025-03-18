@@ -40,6 +40,43 @@ glimpse(town_campaign)
 
 We are working on the dimensions and codebook for this dataset. 
 
+
+## Data Cleaning
+```{r}
+#Department Column
+sept_kpis <- sept_kpis |>
+  rename("Department" = "Children's Services") 
+
+sept_kpis[1, "Department"] <- "Children's Services"
+
+sept_kpis <- sept_kpis |>
+  fill(Department, .direction = "down")
+
+#Program Column
+sept_kpis <- sept_kpis |>
+  rename("Program" = "...2") 
+
+sept_kpis[1, "Program"] <- "Children's Services"
+sept_kpis[24, "Program"] <- "Housing Services"
+sept_kpis[82, "Program"] <- "Development"
+sept_kpis[90, "Program"] <- "CCFC"
+sept_kpis[103, "Program"] <- "Asset Management"
+sept_kpis[107, "Program"] <- "Property Management"
+sept_kpis[110, "Program"] <- "Finance"
+sept_kpis[140, "Program"] <- "Human Resources"
+sept_kpis[142, "Program"] <- "Open Positions"
+sept_kpis[157, "Program"] <- "Time to Hire"
+sept_kpis[172, "Program"] <- "Head Count"
+sept_kpis[187, "Program"] <- "Turnover Rate"
+
+sept_kpis <- sept_kpis |>
+  fill(Program, .direction = "down")
+
+```
+
+
+
+
 ## 3. Data analysis plan
 
 The Sept KPIs dataset has data on the goal for each program and what percentage of that goal was met in the 2024 fiscal year. 
