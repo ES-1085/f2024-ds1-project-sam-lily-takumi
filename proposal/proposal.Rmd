@@ -8,6 +8,8 @@ output: html_document
 library(tidyverse)
 library(broom)
 library(readxl)
+library(dplyr)
+library(tidyr)
 ```
 
 ## 1. Introduction
@@ -30,7 +32,7 @@ Below is us reading in our data and glimpsing it.
 
 ```{r read-data}
 sept_kpis <- read_excel("../data/FY24 Sept KPIs - Total Agency.xlsx")
-town_campaign <- read_excel("../data/FY24 Town Campaign Data.xlsx")
+town_campaign <- read_excel("../data/FY24 Town Campaign Data.xlsx", sheet = 1, col_names = FALSE)
 ```
 ```{r glimpse-data}
 glimpse(sept_kpis)
@@ -42,8 +44,8 @@ We are working on the dimensions and codebook for this dataset.
 
 
 ## Data Cleaning
-```{r}
-#Department Column
+```{r kpis-cleaning}
+#Department Column for kpis
 sept_kpis <- sept_kpis |>
   rename("Department" = "Children's Services") 
 
@@ -52,7 +54,7 @@ sept_kpis[1, "Department"] <- "Children's Services"
 sept_kpis <- sept_kpis |>
   fill(Department, .direction = "down")
 
-#Program Column
+#Program Column for kpis
 sept_kpis <- sept_kpis |>
   rename("Program" = "...2") 
 
@@ -72,8 +74,77 @@ sept_kpis[187, "Program"] <- "Turnover Rate"
 sept_kpis <- sept_kpis |>
   fill(Program, .direction = "down")
 
+sept_kpis <- sept_kpis[, -c(18, 19)]
+
 ```
 
+```{r town-campaign-cleaning}
+town_campaign_cps <- town_campaign |>
+  select(...1,...2,...3,...4,...5,...6,...7,...8,...9,...24,...25,...26,...27,...28, ...29)
+
+town_campaign_cps <- town_campaign_cps |>
+  rename(town = ...1, tanf_fuelass_households = ...2, tanf_fuelass_investment = ...3, fuelass_households = ...4, fuelass_investment = ...5, heap_households = ...6, heap_investment = ...7, ecip_households = ...8, ecip_investment = ...9,  family_coaching_households = ...24, family_coaching_investment = ...25, maine_families_households = ...26, maine_families_investment = ...27, parent_education_households = ...28, parent_education_investment = ...29 )
+
+town_campaign_cps <- town_campaign_cps[-c(1, 2, 3, 4, 5, 6, 7, 8, 9), ]
+
+town_campaign_cps <- town_campaign_cps[!apply(town_campaign_cps[, -1], 1, function(x) all(is.na(x))), ]
+town_campaign_cps[, -1] <- lapply(town_campaign_cps[, -1], as.numeric)
+town_campaign_cps[is.na(town_campaign_cps)] <- 0
+
+totals <- colSums(town_campaign_cps[, -1])
+town_campaign_cps <- bind_rows(town_campaign_cps, totals)
+
+
+summary_data <- town_campaign_cps[-seq(1, 193), ]
+
+summary_data <- summary_data|>
+  pivot_longer(cols = -town,
+               values_to = "value")
+
+summary_data <- summary_data|>
+  mutate(data_type = rep(c("households", "investment"), 
+                         times = ncol(df) / 2, length.out = nrow(summary_data)),
+         program = rep(c("tanf_fuelass", "fuelass", "heap", "ecip", 
+                         "family_coaching", "maine_families", "parent_education"), 
+                      each = 2, length.out = nrow(summary_data)))
+
+summary_data_long <- summary_data[,-c(1, 2) ]
+
+summary_data_wide <- summary_data_long |>
+  pivot_wider(names_from = data_type, values_from = value)
+  
+```
+
+## Visualizations
+```{r visualizations}
+ggplot(summary_data_wide, aes(x = program, y = investment, fill = program)) +
+  geom_bar(stat="identity", show.legend = FALSE) +
+  scale_x_discrete(labels = c("ecip" = "ECIP", 
+                              "family_coaching" = "Family Coaching", 
+                              "fuelass" = "Fuel Ass. (Non State/Fed)",
+                              "heap" = "HEAP",
+                              "maine_families" = "Maine Families",
+                              "parent_education" = "Parent Education",
+                              "tanf_fuelass" = "TANF for Fuel Assistance")) +
+  labs(title="Investment per Customer and Prevention Services Program",
+       x="Program", y="Investment in $") +
+  theme(axis.text.x = element_text(angle=45, hjust=1))
+
+ggplot(summary_data_wide, aes(x = program, y = households, fill = program)) +
+  geom_bar(stat="identity", show.legend = FALSE) +
+  scale_x_discrete(labels = c("ecip" = "ECIP", 
+                              "family_coaching" = "Family Coaching", 
+                              "fuelass" = "Fuel Ass. (Non State/Fed)",
+                              "heap" = "HEAP",
+                              "maine_families" = "Maine Families",
+                              "parent_education" = "Parent Education",
+                              "tanf_fuelass" = "TANF for Fuel Assistance")) +
+  labs(title="Houshelds Helped by Customer and Prevention Services Program",
+       x="Program", y="Investment in $") +
+  theme(axis.text.x = element_text(angle=45, hjust=1))
+
+
+```
 
 
 
