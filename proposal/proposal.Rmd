@@ -140,13 +140,80 @@ ggplot(summary_data_wide, aes(x = program, y = households, fill = program)) +
                               "parent_education" = "Parent Education",
                               "tanf_fuelass" = "TANF for Fuel Assistance")) +
   labs(title="Houshelds Helped by Customer and Prevention Services Program",
-       x="Program", y="Investment in $") +
+       x="Program", y="Households") +
   theme(axis.text.x = element_text(angle=45, hjust=1))
 
 
 ```
 
 
+KPI Visualization:
+```{r}
+sept_kpis_cleaned <- sept_kpis[!is.na(sept_kpis$`% of Goal`), ]
+sept_kpis_cleaned <- sept_kpis_cleaned |>
+  filter(Department == "Customer & Prevention Services")
+sept_kpis_cleaned$YTD <- as.numeric(sept_kpis_cleaned$YTD)
+sept_kpis_cleaned$goal_percent <- sept_kpis_cleaned$`% of Goal`
+sept_kpis_cleaned <- sept_kpis_cleaned[-c(1,11), ]
+
+sept_kpis_cleaned <- sept_kpis_cleaned |>
+  mutate(Assumptions = ifelse(Assumptions == "9500 Applications processed LIHEAP", "LIHEAP Applications Processed", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Maine Families - MEICHV  & Families First                              2800 home visits completed per year", "MEICHV & Families First Home Visits", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "230 families enrolled", "MEICHV & Families First Families Enrolled", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "CAN Council (CB&E)   -                                                                                               4 community events", "CAN Council Events", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "30 playgroups", "Playgroups", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Playgroup 20 participants", "Playgroup Participants", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "9 parent education trainings", "Parent Education Trainings", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Parent Education Trainings 45 participants", "Parent Education Training Participants", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "20 community provider trainings", "Community Provider Trainings", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Community Provider Trainings 160 participants", "Community Provider Trainings Participants", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "# Incoming website inquiries to receptions", "Incoming Website Inquiries to Reception", Assumptions)) 
+  
+  
+
+# STEP 1: Reshape to long format
+kpis_long <- sept_kpis_cleaned %>%
+    pivot_longer(
+    cols = Oct:Sept,                 
+    names_to = "Month",
+    values_to = "Monthly_Total"
+  ) %>%
+  mutate(
+    Month = factor(Month, levels = c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
+                                     "Apr", "May", "Jun", "July", "Aug", "Sept"))
+  )
+
+# STEP 2: Calculate cumulative total per Assumption
+kpis_long <- kpis_long %>%
+  group_by(Assumptions) %>%
+  arrange(Month) %>%
+  mutate(Cumulative = cumsum(Monthly_Total))
+
+# STEP 3: Calculate estimated Goal from YTD and % of Goal
+kpis_long <- kpis_long %>%
+  left_join(
+    sept_kpis_cleaned %>%
+      mutate(
+        Assumptions = Assumptions,
+        Goal = YTD / `% of Goal`
+      ) %>%
+      select(Assumptions, Goal),
+    by = "Assumptions"
+  )
+
+# STEP 4: Plot the cumulative progress
+ggplot(kpis_long, aes(x = Month, y = Cumulative)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(size = 1.5) +
+  geom_hline(aes(yintercept = Goal), linetype = "dashed", color = "darkred") +
+  facet_wrap(~ Assumptions, scales = "free_y") +
+  labs(
+    title = "Cumulative Monthly Progress Toward Goal",
+    x = "Month",
+    y = "Cumulative Total"
+  ) +
+  theme_minimal()
+```
 
 ## 3. Data analysis plan
 
