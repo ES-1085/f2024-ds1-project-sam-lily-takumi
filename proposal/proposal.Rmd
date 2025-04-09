@@ -153,8 +153,7 @@ sept_kpis_cleaned <- sept_kpis[!is.na(sept_kpis$`% of Goal`), ]
 sept_kpis_cleaned <- sept_kpis_cleaned |>
   filter(Department == "Customer & Prevention Services")
 sept_kpis_cleaned$YTD <- as.numeric(sept_kpis_cleaned$YTD)
-sept_kpis_cleaned$goal_percent <- sept_kpis_cleaned$`% of Goal`
-sept_kpis_cleaned <- sept_kpis_cleaned[-c(1,11), ]
+sept_kpis_cleaned <- sept_kpis_cleaned[-c(1,2,3,4,11), ]
 
 sept_kpis_cleaned <- sept_kpis_cleaned |>
   mutate(Assumptions = ifelse(Assumptions == "9500 Applications processed LIHEAP", "LIHEAP Applications Processed", Assumptions)) |>
@@ -169,9 +168,7 @@ sept_kpis_cleaned <- sept_kpis_cleaned |>
   mutate(Assumptions = ifelse(Assumptions == "Community Provider Trainings 160 participants", "Community Provider Trainings Participants", Assumptions)) |>
   mutate(Assumptions = ifelse(Assumptions == "# Incoming website inquiries to receptions", "Incoming Website Inquiries to Reception", Assumptions)) 
   
-  
 
-# STEP 1: Reshape to long format
 kpis_long <- sept_kpis_cleaned %>%
     pivot_longer(
     cols = Oct:Sept,                 
@@ -183,13 +180,12 @@ kpis_long <- sept_kpis_cleaned %>%
                                      "Apr", "May", "Jun", "July", "Aug", "Sept"))
   )
 
-# STEP 2: Calculate cumulative total per Assumption
 kpis_long <- kpis_long %>%
   group_by(Assumptions) %>%
   arrange(Month) %>%
   mutate(Cumulative = cumsum(Monthly_Total))
 
-# STEP 3: Calculate estimated Goal from YTD and % of Goal
+
 kpis_long <- kpis_long %>%
   left_join(
     sept_kpis_cleaned %>%
@@ -201,14 +197,25 @@ kpis_long <- kpis_long %>%
     by = "Assumptions"
   )
 
-# STEP 4: Plot the cumulative progress
+kpis_long$Assumptions <- factor(
+  kpis_long$Assumptions,
+  levels = c(
+    "Community Provider Trainings",
+    "Community Provider Trainings Participants",
+    "Parent Education Trainings",
+    "Parent Education Training Participants",
+    "Playgroups",
+    "Playgroup Participants"
+  )
+)
+
 ggplot(kpis_long, aes(x = Month, y = Cumulative)) +
   geom_line(color = "steelblue", size = 1) +
   geom_point(size = 1.5) +
   geom_hline(aes(yintercept = Goal), linetype = "dashed", color = "darkred") +
-  facet_wrap(~ Assumptions, scales = "free_y") +
+  facet_wrap(~ Assumptions, scales = "free_y", nrow = 3) +
   labs(
-    title = "Cumulative Monthly Progress Toward Goal",
+    title = "Monthly Progress Toward Family Services Goals",
     x = "Month",
     y = "Cumulative Total"
   ) +
