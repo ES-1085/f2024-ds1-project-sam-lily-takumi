@@ -9,9 +9,21 @@ This document should contain a detailed account of the data clean up for your da
 ```{r load-packages, message = FALSE}
 library(tidyverse)
 library(broom)
+library(readxl)
+library(viridis)
+library(dplyr)
+library(tidyr)
+library(ggrepel)
 ```
 
+
 ## Data Clean Up Steps for Overall Data
+
+### Load Data
+```{r read-data}
+sept_kpis <- read_excel("../data/FY24 Sept KPIs - Total Agency.xlsx")
+town_campaign <- read_excel("../data/FY24 Town Campaign Data.xlsx", sheet = 1, col_names = FALSE)
+```
 
 ### Step 1: Cleaning the KPIs dataset
 
@@ -89,32 +101,46 @@ summary_data_wide <- summary_data_long |>
 
 ## Plots
 
-### ggsave example for saving plots
+### Plot 1: Customer & Prevention Services Program Investments
 
-```{r starwars ggsave example}
-p1 <- starwars |>
-  filter(mass < 1000, 
-         species %in% c("Human", "Cerean", "Pau'an", "Droid", "Gungan")) |>
-  ggplot() +
-  geom_point(aes(x = mass, 
-                 y = height, 
-                 color = species)) +
-  labs(x = "Weight (kg)", 
-       y = "Height (m)",
-       color = "Species",
-       title = "Weight and Height of Select Starwars Species",
-       caption = paste("This data comes from the starwars api: https://swapi.py43.com"))
-
-
-ggsave("example-starwars.png", width = 4, height = 4)
-
-ggsave("example-starwars-wide.png", width = 6, height = 4)
+```{r cps-investments}
+ggplot(summary_data_wide, aes(x = reorder(program, investment), y = investment, fill = program)) +
+  geom_bar(stat="identity", show.legend = FALSE) +
+  scale_x_discrete(labels = c("ecip" = "ECIP", 
+                              "family_coaching" = "Family Coaching", 
+                              "fuelass" = "Fuel Ass. (Non State/Fed)",
+                              "heap" = "HEAP",
+                              "maine_families" = "Maine Families",
+                              "parent_education" = "Parent Education",
+                              "tanf_fuelass" = "TANF for Fuel Assistance")) +
+  labs(title="Investment into Customer & Prevention Services Programs",
+       x="Program", y="Investment in $") +
+  coord_flip() +
+  scale_fill_viridis_d()
 ```
 
 
+### Plot 2: Customer & Prevention Services Program Households Helped
+```{r cps-households-helped}
+ggplot(summary_data_wide, aes(x = reorder(program, households), y = households, fill = program)) +
+  geom_bar(stat="identity", show.legend = FALSE) +
+  scale_x_discrete(labels = c("ecip" = "ECIP", 
+                              "family_coaching" = "Family Coaching", 
+                              "fuelass" = "Fuel Ass. (Non State/Fed)",
+                              "heap" = "HEAP",
+                              "maine_families" = "Maine Families",
+                              "parent_education" = "Parent Education",
+                              "tanf_fuelass" = "TANF for Fuel Assistance")) +
+  labs(title="Houshelds Helped by Customer & Prevention Services Programs",
+       x="Program", y="Households") +
+  coord_flip() +
+  scale_fill_viridis_d()
+```
 
-### Plot 1: _________
 
+### Plot 3: ___________
+
+Add more plot sections as needed. Each project should have at least 3 plots, but talk to me if you have fewer than 3.
 #### Data cleanup steps specific to plot 1
 
 These data cleaning sections are optional and depend on if you have some data cleaning steps specific to a particular plot
@@ -122,20 +148,5 @@ These data cleaning sections are optional and depend on if you have some data cl
 ```{r}
 
 ```
-
-
-#### Final Plot 1
-
-```{r}
-
-```
-
-
-### Plot 2: _________
-
-### Plot 3: ___________
-
-Add more plot sections as needed. Each project should have at least 3 plots, but talk to me if you have fewer than 3.
-
 ### Plot 4: ___________ 
 

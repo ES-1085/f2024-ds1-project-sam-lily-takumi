@@ -8,8 +8,10 @@ output: html_document
 library(tidyverse)
 library(broom)
 library(readxl)
+library(viridis)
 library(dplyr)
 library(tidyr)
+library(ggrepel)
 ```
 
 ## 1. Introduction
@@ -117,7 +119,7 @@ summary_data_wide <- summary_data_long |>
 
 ## Visualizations
 ```{r visualizations}
-ggplot(summary_data_wide, aes(x = program, y = investment, fill = program)) +
+ggplot(summary_data_wide, aes(x = reorder(program, investment), y = investment, fill = program)) +
   geom_bar(stat="identity", show.legend = FALSE) +
   scale_x_discrete(labels = c("ecip" = "ECIP", 
                               "family_coaching" = "Family Coaching", 
@@ -126,11 +128,12 @@ ggplot(summary_data_wide, aes(x = program, y = investment, fill = program)) +
                               "maine_families" = "Maine Families",
                               "parent_education" = "Parent Education",
                               "tanf_fuelass" = "TANF for Fuel Assistance")) +
-  labs(title="Investment per Customer and Prevention Services Program",
+  labs(title="Investment into Customer & Prevention Services Programs",
        x="Program", y="Investment in $") +
-  theme(axis.text.x = element_text(angle=45, hjust=1))
+  coord_flip() +
+  scale_fill_viridis_d()
 
-ggplot(summary_data_wide, aes(x = program, y = households, fill = program)) +
+ggplot(summary_data_wide, aes(x = reorder(program, households), y = households, fill = program)) +
   geom_bar(stat="identity", show.legend = FALSE) +
   scale_x_discrete(labels = c("ecip" = "ECIP", 
                               "family_coaching" = "Family Coaching", 
@@ -139,9 +142,10 @@ ggplot(summary_data_wide, aes(x = program, y = households, fill = program)) +
                               "maine_families" = "Maine Families",
                               "parent_education" = "Parent Education",
                               "tanf_fuelass" = "TANF for Fuel Assistance")) +
-  labs(title="Houshelds Helped by Customer and Prevention Services Program",
+  labs(title="Houshelds Helped by Customer & Prevention Services Programs",
        x="Program", y="Households") +
-  theme(axis.text.x = element_text(angle=45, hjust=1))
+  coord_flip() +
+  scale_fill_viridis_d()
 
 
 ```
@@ -210,21 +214,82 @@ kpis_long$Assumptions <- factor(
 )
 
 ggplot(kpis_long, aes(x = Month, y = Cumulative)) +
-  geom_line(color = "steelblue", size = 1) +
-  geom_point(size = 1.5) +
-  geom_hline(aes(yintercept = Goal), linetype = "dashed", color = "darkred") +
+  geom_line(aes(color = "Cumulative Total"), size = 1) +
+  geom_point(aes(color = "Cumulative Total"), size = 1.5) +
+  geom_hline(aes(yintercept = Goal, color = "Yearly Goal"), linetype = "dashed", size = 1) +
   facet_wrap(~ Assumptions, scales = "free_y", nrow = 3) +
+  scale_color_manual(
+    name = "",
+    values = c("Cumulative Total" = "black", "Yearly Goal" = "darkred")
+  ) +
   labs(
     title = "Monthly Progress Toward Family Services Goals",
     x = "Month",
     y = "Cumulative Total"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
 ```
 Whole Family Visualization:
 ```{r}
-sept_kpis_wholefamily <- sept_kpis |>
+sept_kpis_wholefamily <- sept_kpis %>%
   filter(Department == "Customer & Prevention Services", Program == "Whole Family")
+
+sept_kpis_wholefamily <- sept_kpis_wholefamily[c(1,5,6), ]
+
+sept_kpis_wholefamily <- sept_kpis_wholefamily |>
+  mutate(Assumptions = ifelse(Assumptions == "# Families Newly Enrolled in Whole Family Program (month)", "Families Newly Enrolled", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "# Adult Caregivers Newly Enrolled (month)", "Adult Caregivers Newly Enrolled", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "# Minor Dependent Children Newly Enrolled (month)", "Minor Dependent Children Newly Enrolled", Assumptions))
+
+# Pivot the data to long format
+kpis_wholefamily_long <- sept_kpis_wholefamily %>%
+  pivot_longer(
+    cols = Oct:Sept,                 
+    names_to = "Month",
+    values_to = "Monthly_Total"
+  ) %>%
+  mutate(
+    Month = factor(Month, levels = c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
+                                     "Apr", "May", "Jun", "July", "Aug", "Sept"))
+  )
+
+kpis_wholefamily_long <- kpis_wholefamily_long %>%
+  group_by(Assumptions) %>%
+  arrange(Month) %>%
+  mutate(Cumulative = cumsum(Monthly_Total))
+
+kpis_wholefamily_long$Assumptions <- factor(
+  kpis_wholefamily_long$Assumptions,
+  levels = c(
+    "Families Newly Enrolled",
+    "Adult Caregivers Newly Enrolled",
+    "Minor Dependent Children Newly Enrolled"
+  )
+)
+
+endpoint_labels <- kpis_wholefamily_long %>%
+  group_by(Assumptions) %>%
+  filter(as.numeric(Month) == max(as.numeric(Month)))
+
+ggplot(kpis_wholefamily_long, aes(x = Month, y = Cumulative)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(size = 1.5) +
+  geom_text_repel(data = endpoint_labels,
+                  aes(label = Cumulative),
+                  nudge_x = 0.3,
+                  size = 4,
+                  color = "blue") +
+  facet_wrap(~ Assumptions, nrow = 3) +
+  labs(
+    title = "Monthly Progress for Whole Family Services Program",
+    subtitle = "Blue Number Represents Cumulative Yearly Total",
+    x = "Month",
+    y = "Cumulative Total"
+  ) +
+  theme_minimal()
+
 ```
 
 
