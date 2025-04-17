@@ -1,6 +1,6 @@
 ---
-title: "Project memo"
-author: "Team name"
+title: "MATH117 Final Project Memo"
+author: "Community Concepts 1: Lily, Sam, Takumi"
 output: github_document
 ---
 

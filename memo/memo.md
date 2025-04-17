@@ -1,6 +1,6 @@
-Project memo
+MATH117 Final Project Memo
 ================
-Team name
+Community Concepts 1: Lily, Sam, Takumi
 
 This document should contain a detailed account of the data clean up for
 your data and the design choices you are making for your plots. For
