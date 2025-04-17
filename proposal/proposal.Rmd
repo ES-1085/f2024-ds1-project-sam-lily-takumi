@@ -221,6 +221,14 @@ ggplot(kpis_long, aes(x = Month, y = Cumulative)) +
   ) +
   theme_minimal()
 ```
+Whole Family Visualization:
+```{r}
+sept_kpis_wholefamily <- sept_kpis |>
+  filter(Department == "Customer & Prevention Services", Program == "Whole Family")
+```
+
+
+
 
 ## 3. Data analysis plan
 

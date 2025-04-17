@@ -13,13 +13,79 @@ library(broom)
 
 ## Data Clean Up Steps for Overall Data
 
-### Step 1: _________
+### Step 1: Cleaning the KPIs dataset
 
-```{r}
+```{r kpis-cleaning}
+#Department Column for kpis
+sept_kpis <- sept_kpis |>
+  rename("Department" = "Children's Services") 
+
+sept_kpis[1, "Department"] <- "Children's Services"
+
+sept_kpis <- sept_kpis |>
+  fill(Department, .direction = "down")
+
+#Program Column for kpis
+sept_kpis <- sept_kpis |>
+  rename("Program" = "...2") 
+
+sept_kpis[1, "Program"] <- "Children's Services"
+sept_kpis[24, "Program"] <- "Housing Services"
+sept_kpis[82, "Program"] <- "Development"
+sept_kpis[90, "Program"] <- "CCFC"
+sept_kpis[103, "Program"] <- "Asset Management"
+sept_kpis[107, "Program"] <- "Property Management"
+sept_kpis[110, "Program"] <- "Finance"
+sept_kpis[140, "Program"] <- "Human Resources"
+sept_kpis[142, "Program"] <- "Open Positions"
+sept_kpis[157, "Program"] <- "Time to Hire"
+sept_kpis[172, "Program"] <- "Head Count"
+sept_kpis[187, "Program"] <- "Turnover Rate"
+
+sept_kpis <- sept_kpis |>
+  fill(Program, .direction = "down")
+
+sept_kpis <- sept_kpis[, -c(18, 19)]
 
 ```
 
-### Step 2: ________
+### Step 2: Cleaning Town Campaign Dataset
+```{r town-campaign-cleaning}
+town_campaign_cps <- town_campaign |>
+  select(...1,...2,...3,...4,...5,...6,...7,...8,...9,...24,...25,...26,...27,...28, ...29)
+
+town_campaign_cps <- town_campaign_cps |>
+  rename(town = ...1, tanf_fuelass_households = ...2, tanf_fuelass_investment = ...3, fuelass_households = ...4, fuelass_investment = ...5, heap_households = ...6, heap_investment = ...7, ecip_households = ...8, ecip_investment = ...9,  family_coaching_households = ...24, family_coaching_investment = ...25, maine_families_households = ...26, maine_families_investment = ...27, parent_education_households = ...28, parent_education_investment = ...29 )
+
+town_campaign_cps <- town_campaign_cps[-c(1, 2, 3, 4, 5, 6, 7, 8, 9), ]
+
+town_campaign_cps <- town_campaign_cps[!apply(town_campaign_cps[, -1], 1, function(x) all(is.na(x))), ]
+town_campaign_cps[, -1] <- lapply(town_campaign_cps[, -1], as.numeric)
+town_campaign_cps[is.na(town_campaign_cps)] <- 0
+
+totals <- colSums(town_campaign_cps[, -1])
+town_campaign_cps <- bind_rows(town_campaign_cps, totals)
+
+
+summary_data <- town_campaign_cps[-seq(1, 193), ]
+
+summary_data <- summary_data|>
+  pivot_longer(cols = -town,
+               values_to = "value")
+
+summary_data <- summary_data|>
+  mutate(data_type = rep(c("households", "investment"), 
+                         times = ncol(df) / 2, length.out = nrow(summary_data)),
+         program = rep(c("tanf_fuelass", "fuelass", "heap", "ecip", 
+                         "family_coaching", "maine_families", "parent_education"), 
+                      each = 2, length.out = nrow(summary_data)))
+
+summary_data_long <- summary_data[,-c(1, 2) ]
+
+summary_data_wide <- summary_data_long |>
+  pivot_wider(names_from = data_type, values_from = value)
+  
+```
 
 ## Plots
 
