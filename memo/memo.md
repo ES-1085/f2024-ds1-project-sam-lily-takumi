@@ -195,7 +195,7 @@ ggplot(summary_data_wide, aes(x = reorder(program, investment), y = investment, 
   scale_fill_viridis_d()
 ```
 
-![](memo_files/figure-gfm/cps-investments-1.png)<!-- -->
+<img src="memo_files/figure-gfm/cps-investments-1.png" alt="Horizontal bar chart detailing the amount of financial investment allocated to various CCI Customer and Prevention Services Programs. The chart shows that the largest portion of funding went to the HEAP program, followed by Maine Families, both receiving significantly more than the other programs. ECIP and TANF for Fuel Assistance received moderate funding amounts, while Family Coaching, Non-State and Federal Fuel Assistance, and Parent Education received comparatively smaller investments, with Parent Education receiving the least (and none at all). The chart highlights a clear monetary prioritization of energy and family support services."  />
 
 ### Plot 2: Customer & Prevention Services Program Households Helped
 
@@ -215,15 +215,186 @@ ggplot(summary_data_wide, aes(x = reorder(program, households), y = households, 
   scale_fill_viridis_d()
 ```
 
-![](memo_files/figure-gfm/cps-households-helped-1.png)<!-- -->
+<img src="memo_files/figure-gfm/cps-households-helped-1.png" alt="Horizontal bar chart illustrating the number of households served by the different customer and prevention service programs. By far, the largest number of households was served by the HEAP program, reaching over 7,000 households. TANF for Fuel Assistance and ECIP were next, each assisting just under 1,000 households. Maine Families supported several hundred households, while Parent Education, Family Coaching, and Fuel Assistance (Non-State/Federal) were the lowest when it came to total households helped."  />
 
-### Plot 3: \_\_\_\_\_\_\_\_\_\_\_
+### Plot 3: KPI Progress for Family Services
 
-Add more plot sections as needed. Each project should have at least 3
-plots, but talk to me if you have fewer than 3. \#### Data cleanup steps
-specific to plot 1
+#### Data cleanup steps specific to plot 3
 
-These data cleaning sections are optional and depend on if you have some
-data cleaning steps specific to a particular plot
+``` r
+sept_kpis_cleaned <- sept_kpis[!is.na(sept_kpis$`% of Goal`), ]
+sept_kpis_cleaned <- sept_kpis_cleaned |>
+  filter(Department == "Customer & Prevention Services")
+sept_kpis_cleaned$YTD <- as.numeric(sept_kpis_cleaned$YTD)
+sept_kpis_cleaned <- sept_kpis_cleaned[-c(1,2,3,4,11), ]
 
-### Plot 4: \_\_\_\_\_\_\_\_\_\_\_
+sept_kpis_cleaned <- sept_kpis_cleaned |>
+  mutate(Assumptions = ifelse(Assumptions == "9500 Applications processed LIHEAP", "LIHEAP Applications Processed", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Maine Families - MEICHV  & Families First                              2800 home visits completed per year", "MEICHV & Families First Home Visits", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "230 families enrolled", "MEICHV & Families First Families Enrolled", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "CAN Council (CB&E)   -                                                                                               4 community events", "CAN Council Events", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "30 playgroups", "Playgroups", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Playgroup 20 participants", "Playgroup Participants", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "9 parent education trainings", "Parent Education Trainings", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Parent Education Trainings 45 participants", "Parent Education Training Participants", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "20 community provider trainings", "Community Provider Trainings", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "Community Provider Trainings 160 participants", "Community Provider Trainings Participants", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "# Incoming website inquiries to receptions", "Incoming Website Inquiries to Reception", Assumptions)) 
+  
+kpis_long <- sept_kpis_cleaned %>%
+    pivot_longer(
+    cols = Oct:Sept,                 
+    names_to = "Month",
+    values_to = "Monthly_Total"
+  ) %>%
+  mutate(
+    Month = factor(Month, levels = c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
+                                     "Apr", "May", "Jun", "July", "Aug", "Sept"))
+  )
+
+kpis_long <- kpis_long %>%
+  group_by(Assumptions) %>%
+  arrange(Month) %>%
+  mutate(Cumulative = cumsum(Monthly_Total))
+
+
+kpis_long <- kpis_long %>%
+  left_join(
+    sept_kpis_cleaned %>%
+      mutate(
+        Assumptions = Assumptions,
+        Goal = YTD / `% of Goal`
+      ) %>%
+      select(Assumptions, Goal),
+    by = "Assumptions"
+  )
+
+kpis_long$Assumptions <- factor(
+  kpis_long$Assumptions,
+  levels = c(
+    "Community Provider Trainings",
+    "Community Provider Trainings Participants",
+    "Parent Education Trainings",
+    "Parent Education Training Participants",
+    "Playgroups",
+    "Playgroup Participants"
+  )
+)
+```
+
+#### Final Plot 3
+
+``` r
+ggplot(kpis_long, aes(x = Month, y = Cumulative)) +
+  geom_line(aes(color = "Cumulative Total"), size = 1) +
+  geom_point(aes(color = "Cumulative Total"), size = 1.5) +
+  geom_hline(aes(yintercept = Goal, color = "Yearly Goal"), linetype = "dashed", size = 1) +
+  facet_wrap(~ Assumptions, scales = "free_y", nrow = 3) +
+  scale_color_manual(
+    name = "",
+    values = c("Cumulative Total" = "black", "Yearly Goal" = "darkred")
+  ) +
+  labs(
+    title = "Monthly Progress Toward Family Services Goals",
+    x = "Month",
+    y = "Cumulative Total"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
+
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+
+<img src="memo_files/figure-gfm/family-services-kpis-progress-1.png" alt="Faceted line graphs showing cumulative monthly progress from October through September across six different Family Service program goals, with each graph tracking progress toward a specific yearly goal indicated by a red dashed line. All six graphs showed that CCI met or exceeded their annual targets. Participant numbers greatly exceeded expectations, potentially due to a misrepresentation in the data (could be have been a goal per training session, not cumulative). Playgroups took the longest to meet CCIs goals."  />
+
+### Plot 4: Whole Family Program Progress
+
+#### Data cleanup steps specific to plot 4
+
+``` r
+sept_kpis_wholefamily <- sept_kpis %>%
+  filter(Department == "Customer & Prevention Services", Program == "Whole Family")
+
+sept_kpis_wholefamily <- sept_kpis_wholefamily[c(1,5,6), ]
+
+sept_kpis_wholefamily <- sept_kpis_wholefamily |>
+  mutate(Assumptions = ifelse(Assumptions == "# Families Newly Enrolled in Whole Family Program (month)", "Families Newly Enrolled", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "# Adult Caregivers Newly Enrolled (month)", "Adult Caregivers Newly Enrolled", Assumptions)) |>
+  mutate(Assumptions = ifelse(Assumptions == "# Minor Dependent Children Newly Enrolled (month)", "Minor Dependent Children Newly Enrolled", Assumptions))
+
+kpis_wholefamily_long <- sept_kpis_wholefamily %>%
+  pivot_longer(
+    cols = Oct:Sept,                 
+    names_to = "Month",
+    values_to = "Monthly_Total"
+  ) %>%
+  mutate(
+    Month = factor(Month, levels = c("Oct", "Nov", "Dec", "Jan", "Feb", "Mar",
+                                     "Apr", "May", "Jun", "July", "Aug", "Sept"))
+  )
+
+kpis_wholefamily_long <- kpis_wholefamily_long %>%
+  group_by(Assumptions) %>%
+  arrange(Month) %>%
+  mutate(Cumulative = cumsum(Monthly_Total))
+
+kpis_wholefamily_long$Assumptions <- factor(
+  kpis_wholefamily_long$Assumptions,
+  levels = c(
+    "Families Newly Enrolled",
+    "Adult Caregivers Newly Enrolled",
+    "Minor Dependent Children Newly Enrolled"
+  )
+)
+
+endpoint_labels <- kpis_wholefamily_long %>%
+  group_by(Assumptions) %>%
+  filter(as.numeric(Month) == max(as.numeric(Month)))
+```
+
+#### Final Plot 4
+
+``` r
+ggplot(kpis_wholefamily_long, aes(x = Month, y = Cumulative)) +
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(size = 1.5) +
+  geom_text_repel(data = endpoint_labels,
+                  aes(label = Cumulative),
+                  nudge_x = 0.3,
+                  size = 4,
+                  color = "blue") +
+  facet_wrap(~ Assumptions, nrow = 3) +
+  labs(
+    title = "Monthly Progress for Whole Family Services Program",
+    subtitle = "Blue Number Represents Cumulative Yearly Total",
+    x = "Month",
+    y = "Cumulative Total"
+  ) +
+  theme_minimal()
+```
+
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+    ## `geom_line()`: Each group consists of only one observation.
+    ## ℹ Do you need to adjust the group aesthetic?
+
+<img src="memo_files/figure-gfm/whole-family-program-progress-1.png" alt="Line graphs that shows the monthly progress of the Whole Family Services Program, tracking the cumulative number of families, adult caregivers, and minor dependent children newly enrolled from October through September. Each group’s progress is shown on a separate line graph with black dots marking the monthly cumulative total. By the end of the period of the fiscal year, 170 families, 200 adult caregivers, and 176 minor dependent children were newly enrolled, as highlighted by blue numbers next to each final data point. The chart emphasizes steady growth over time, with noticeable increases in enrollment during the spring and summer months."  />
