@@ -4,7 +4,7 @@ by Sam, Lily, Takumi
 
 ## Summary
 
-This project explored how efficiently and effectively Community Concepts, Inc., a nonprofit based in Lewiston, Maine, allocates its resources across its Family Service programs. Our primary focus was on their Customer and Prevention Services, and we investigated whether funding correlates with program success and which programs were effectively reaching their targets. 
+This project explored how efficiently and effectively Community Concepts, Inc. a nonprofit based in Lewiston, Maine, allocates its resources across its Family Service programs. Our primary focus was on their Customer and Prevention Services, and we investigated whether funding correlates with program success and which programs were effectively reaching their targets. 
 
 ## Handout
 
