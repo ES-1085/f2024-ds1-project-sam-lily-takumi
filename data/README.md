@@ -2,6 +2,7 @@
 ## FY24 Town Campaign Data
 
 -`town`: Name of the town where services were provided
+
 -`tanf_fuelass_households`: Number of households assisted through TANF Fuel Assistance
 -`tanf_fuelass_investment`: Total funds spent on TANF Fuel Assistance
 -`fuelass_households`: Number of households assisted through general Fuel Assistance
