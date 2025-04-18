@@ -5,9 +5,10 @@ by Sam, Lily, Takumi
 ## Summary
 
 This project explored how efficiently and effectively Community Concepts, Inc., a nonprofit based in Lewiston, Maine, allocates its resources across its Family Service programs. Our primary focus was on their Customer and Prevention Services, and we investigated whether funding correlates with program success and which programs were effectively reaching their targets. 
+
 ## Handout
 
-Our presentation can be found ([Here](https://github.com/ES-1085/f2024-ds1-project-sam-lily-takumi/blob/26a5205efdac44b3e51f8d78b57507b70c65dfbd/memo/Is%20Community%20Concepts%20meeting%20their%20goals.pdf)). You can update the filename and extension of your handout.
+Our presentation can be found ([Here](https://github.com/ES-1085/f2024-ds1-project-sam-lily-takumi/blob/26a5205efdac44b3e51f8d78b57507b70c65dfbd/memo/Is%20Community%20Concepts%20meeting%20their%20goals.pdf)).
 
 ## Memo
 
