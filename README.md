@@ -4,7 +4,7 @@ by Sam, Lily, Takumi
 
 ## Summary
 
-This project explored how efficiently and effectively Community Concepts, a nonprofit based in Lewiston, Maine, allocates its resources across its Family Service programs. Our primary focus was on their Customer and Prevention Services, and we investigated whether funding correlates with program success and which programs were effectively reaching their targets. 
+This project explored how efficiently and effectively Community Concepts, a nonprofit based in Lewiston, Maine, allocates its resources across its Family Service programs. Theses programs have the purpose to support local families though housing assistance, child development services, parenting support, and crisis prevention. Our primary focus was on their Customer and Prevention Services division, which includes a range of programs such as HEAP(Home Energy Assistance Programs), parent education, and family coaching. We investigated whether funding correlates with program success. Through our analysis, we attempted to grasp a better understanding of how well targets were being achieved. 
 
 ## Handout
 
