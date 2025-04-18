@@ -1,34 +1,23 @@
-Project title
+Community Concepts
 ================
-by Team name
+by Sam, Lily, Takumi
 
 ## Summary
 
-Write-up of your project and findings go here. Think of this as the text
-of your handout. The length should be roughly 5 minutes when read
-out loud. Although pacing varies, a 5-minute speech is roughly 750
-words. 
-
-Your results with proper output and
-graphics go in your handout, this space is for a brief summary of
-your project.
-
+This project explored how efficiently and effectively Community Concepts, Inc., a nonprofit based in Lewiston, Maine, allocates its resources across its Family Service programs. Our primary focus was on their Customer and Prevention Services, and we investigated whether funding correlates with program success and which programs were effectively reaching their targets. 
 ## Handout
 
-Our presentation can be found [here](handout/handout.pdf). You can update the filename and extension of your handout.
+Our presentation can be found [here](memo/Is Community Concepts meeting their goals.pdf). You can update the filename and extension of your handout.
 
 ## Memo
 
-A link to the code and how we created our graphics in our memo can be found [here](memo/memo.html).
+A link to the code and how we created our graphics in our memo can be found [here](memo/memo.Rmd).
 
 ## Data
 
-Include a citation for your data here. See
-<http://libraryguides.vu.edu.au/c.php?g=386501&p=4347840> for guidance
-on proper citation for datasets. If you got your data off the web, make
-sure to note the retrieval date.
+Community Concepts, FY24 Town Campaign Data, and FY24 Sept KPIs – Total Agency. Data provided to our class project group by Community Concepts.
+Retrieved: February 2025.
 
 ## References
 
-List any references here. You should, at a minimum, list your data
-source.
+Community Concepts, Inc. Datasets (2024)
